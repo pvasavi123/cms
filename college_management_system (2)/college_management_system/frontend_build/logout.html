@@ -76,91 +76,29 @@
         <a href="login.html" class="btn-login">Login Again</a>
     </div>
 
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
     <script>
-        let timeLeft = 5;
-        const timerElement = document.getElementById('timer');
-        const statusMessageElement = document.getElementById('statusMessage');
-        let countdownInterval;
+         document.addEventListener('DOMContentLoaded', function() {
+             // Call the logout function from auth.js when the page loads
+             logout();
 
-        // Function to get CSRF token (Django specific)
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        function startRedirectTimer() {
-            timerElement.textContent = timeLeft; // Initialize timer display
-            countdownInterval = setInterval(() => {
-                timeLeft--;
-                timerElement.textContent = timeLeft;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = 'login.html'; // Redirect to login.html
-                }
-            }, 1000);
-        }
-
-        async function performLogout() {
-            const token = localStorage.getItem('authToken');
-            
-            // Clear client-side storage immediately regardless of API call success for security.
-            // The API call is to invalidate the token on the server.
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userData');
-            // sessionStorage.clear(); // If you use sessionStorage
-
-            if (token) {
-                try {
-                    const response = await fetch('/api/auth/logout/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Token ${token}`,
-                            'X-CSRFToken': getCookie('csrftoken') // CSRF needed for session logout if active
-                        },
-                        // No body is needed for this specific logout endpoint
-                    });
-
-                    if (response.ok) {
-                        console.log('Successfully logged out from backend.');
-                        statusMessageElement.textContent = 'Logged out successfully!';
-                        statusMessageElement.classList.remove('text-muted');
-                        statusMessageElement.classList.add('text-success');
-                    } else {
-                        // Even if backend logout fails (e.g., token already invalid), proceed with client-side logout
-                        console.warn('Backend logout call failed or user was not authenticated. Status:', response.status);
-                        statusMessageElement.textContent = 'Logout processed. Session might have already expired.';
-                        statusMessageElement.classList.remove('text-muted');
-                        statusMessageElement.classList.add('text-warning');
-                    }
-                } catch (error) {
-                    console.error('Error during logout API call:', error);
-                    statusMessageElement.textContent = 'Error connecting to logout service. Cleared local session.';
-                    statusMessageElement.classList.remove('text-muted');
-                    statusMessageElement.classList.add('text-danger');
-                }
-            } else {
-                console.log('No auth token found in localStorage. Proceeding with client-side cleanup.');
-                statusMessageElement.textContent = 'No active session found. Redirecting...';
-            }
-            
-            startRedirectTimer(); // Start timer after API call attempt
-        }
-
-        window.onload = function() {
-            performLogout();
-        };
+             // You might want to keep the timer for user feedback, but the redirect is handled by logout()
+             let timeLeft = 5; // Keep for display
+             const timerElement = document.getElementById('timer');
+             if(timerElement) {
+                  timerElement.textContent = timeLeft;
+                  const countdownInterval = setInterval(() => {
+                      timeLeft--;
+                      if(timerElement) timerElement.textContent = timeLeft;
+                       if (timeLeft <= 0) {
+                           clearInterval(countdownInterval);
+                           // Redirection is now handled by the logout() function
+                       }
+                   }, 1000);
+             }
+        });
     </script>
+
 </body>
 </html>

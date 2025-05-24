@@ -4,6 +4,11 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.views.generic import TemplateView
 from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework import permissions
+from django.db.models import Count, F # You might need these for aggregation
+
 
 from .models import ( 
             AcademicEvent, FacultyProfile, Notice, HelpRequest, Semester,StudentProfile, Course, 
@@ -25,6 +30,70 @@ class SignUpView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
+# Add this class definition to your core/views.py file
+
+class StudentTodayScheduleView(APIView):
+        permission_classes = [permissions.IsAuthenticated]
+
+        def get(self, request, *args, **kwargs):
+            user = request.user
+            try:
+                student_profile = user.studentprofile # Assuming the one-to-one relationship
+            except StudentProfile.DoesNotExist:
+                return Response({'error': 'Student profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+            today = timezone.now().date()
+            # Get the current day of the week as a number (0 for Monday, 6 for Sunday)
+            today_weekday = today.weekday()
+
+            # Find the current semester (assuming you have a way to mark the current semester)
+            try:
+                current_semester = Semester.objects.get(is_current=True) # Example
+            except Semester.DoesNotExist:
+                # If no current semester is defined, there's no schedule for the current semester
+                return Response([], status=status.HTTP_200_OK)
+
+
+            # Get the courses the student is enrolled in for the current semester
+            # Ensure 'enrollments' is the correct related_name or accessor on StudentProfile
+            enrolled_course_ids = student_profile.enrollments.filter(
+                semester=current_semester
+            ).values_list('course', flat=True)
+
+
+            # Find schedule entries for these courses for today's weekday
+            # This assumes you have a Schedule model linked to Course and storing weekday and time.
+            # You will need to adapt this query based on your actual scheduling models.
+            # Example query structure (might need significant adjustment based on your models):
+            # Make sure you have a Schedule model imported and linked to Course
+            from .models import Schedule # Import Schedule model if you have one
+
+            today_schedule_entries = Schedule.objects.filter(
+                course__id__in=enrolled_course_ids,
+                day_of_week=today_weekday, # Assuming a field to store weekday number (0-6)
+                semester=current_semester # Filter by the current semester
+            ).order_by('start_time') # Assuming a field for start time
+
+
+            # Serialize the schedule entries
+            # You will need a serializer for your Schedule model, e.g., ScheduleSerializer
+            # from .serializers import ScheduleSerializer
+            # serializer = ScheduleSerializer(today_schedule_entries, many=True)
+
+            # For now, let's return a simplified dictionary list if you don't have a ScheduleSerializer ready
+            simplified_schedule_data = []
+            for entry in today_schedule_entries:
+                simplified_schedule_data.append({
+                    'course_name': entry.course.course_name, # Example field name - adjust
+                    'start_time': entry.start_time.strftime('%H:%M'), # Example formatting - adjust field name
+                    'end_time': entry.end_time.strftime('%H:%M'), # Example formatting - adjust field name
+                    'location': entry.location # Example field name - adjust
+                    # Add other fields as needed to match your Schedule model and what the frontend expects
+                })
+
+
+            # return Response(serializer.data, status=status.HTTP_200_OK) # Use this if you have a serializer
+            return Response(simplified_schedule_data, status=status.HTTP_200_OK) # Use this with simplified data
 
 class LoginView(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -62,6 +131,51 @@ class AcademicEventListCreateView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return [permissions.IsAdminUser()] # Only admins can create
         return [permissions.AllowAny()] # Anyone can read
+class StudentAttendanceSummaryView(APIView):
+        permission_classes = [permissions.IsAuthenticated]
+
+        def get(self, request, *args, **kwargs):
+            user = request.user
+            try:
+                student_profile = user.studentprofile # Assuming the one-to-one relationship accessor is 'studentprofile'
+            except StudentProfile.DoesNotExist:
+                return Response({'error': 'Student profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Calculate total sessions for the student's enrolled courses in the current semester (complex logic)
+            # This is a simplified calculation. A real-world scenario might involve:
+            # 1. Getting the student's enrollments for the current semester.
+            # 2. Getting the courses from those enrollments.
+            # 3. Getting all attendance sessions for those courses in that semester.
+            # For simplicity here, let's count all attendance sessions the student *could* have attended based on enrollments.
+
+            # A more robust approach would involve filtering AttendanceSession based on courses from Enrollments
+            # Here's a simplified approach counting all sessions related to courses the student is enrolled in
+            enrolled_course_ids = student_profile.enrollments.filter(
+                semester__is_current=True # Assuming you have an 'is_current' flag on Semester
+            ).values_list('course__id', flat=True)
+
+            total_sessions = AttendanceSession.objects.filter(
+                course__id__in=enrolled_course_ids,
+                semester__is_current=True # Filter by current semester if needed
+            ).count()
+
+
+            # Calculate attended sessions for the student
+            attended_sessions = StudentAttendance.objects.filter(
+                student=student_profile,
+                session__semester__is_current=True, # Filter by current semester
+                is_present=True
+            ).count()
+
+            attendance_percentage = 0
+            if total_sessions > 0:
+                attendance_percentage = (attended_sessions / total_sessions) * 100
+
+            return Response({
+                'attendance_percentage': round(attendance_percentage, 2),
+                'attended_sessions': attended_sessions,
+                'total_sessions': total_sessions,
+            }, status=status.HTTP_200_OK)
 
 class SemesterListView(generics.ListAPIView):
     queryset = Semester.objects.all().order_by('start_date')

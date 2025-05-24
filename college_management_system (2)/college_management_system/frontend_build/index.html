@@ -51,6 +51,8 @@
 {% block extra_scripts %}
 <!-- Page specific JS -->
 <script>
+</script>
+<script src="{% static 'js/utils.js' %}"></script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize attendance
     const updateAttendance = (percent) => {
@@ -61,28 +63,16 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     // Check if elements exist before updating
     if (document.getElementById('attendancePercent') && document.getElementById('attendanceBar')) {
-         updateAttendance(85); // Example
+         // Example
     }
 
 
     // Populate upcoming events
-    const events = [
-        { date: 'March 15', event: 'Sports Day' },
-        { date: 'March 20', event: 'Science Fair' },
-        { date: 'March 25', event: 'Parent Meeting' }
-    ];
-    const eventsList = document.getElementById('eventsList');
-    if (eventsList) {
-        events.forEach(event => {
-            const li = document.createElement('li');
-            li.textContent = `${event.event} - ${event.date}`;
-            eventsList.appendChild(li);
-        });
-    }
+
 
 
     // Student tips (example - this should likely come from an API)
-    const tips = [ /* ... */ ];
+   
     const tipsList = document.getElementById('tipsList');
     if (tipsList) {
         // Clear existing static tips if any, then populate
@@ -227,5 +217,93 @@ function checkAuth() {
 document.addEventListener('DOMContentLoaded', checkAuth);
 // Ensure getCookie and handleLogoutClick are available
 // ... (getCookie and handleLogoutClick functions)
+document.addEventListener('DOMContentLoaded', async function() {
+    // ... (existing code like updateAttendance function, search logic, help form logic)
+
+    // --- Fetch and display dynamic data ---
+
+    // Fetch and display Upcoming Events
+    const eventsListEl = document.getElementById('eventsList'); // Assuming you have an element with this ID
+    if (eventsListEl) {
+         const academicEvents = await fetchAcademicEvents();
+         if (academicEvents && academicEvents.length > 0) {
+             eventsListEl.innerHTML = ''; // Clear any loading text or placeholders
+             academicEvents.forEach(event => {
+                 const li = document.createElement('li');
+                 // Adjust according to your API response structure
+                 li.textContent = `${event.event_name} - ${event.date_from}`; // Example field names
+                 eventsListEl.appendChild(li);
+             });
+         } else if (eventsListEl) {
+              eventsListEl.innerHTML = '<li>No upcoming events.</li>';
+         }
+    }
+
+
+    // Fetch and display Notices/Tips
+    const tipsListEl = document.getElementById('tipsList'); // Assuming you have an element with this ID
+    if (tipsListEl) {
+         const notices = await fetchNotices();
+         // You might need to filter which notices are considered "tips"
+         const tips = notices.filter(notice => notice.is_tip); // Example filtering
+
+         if (tips && tips.length > 0) {
+             tipsListEl.innerHTML = ''; // Clear any loading text or placeholders
+             tips.forEach(tip => {
+                  const li = document.createElement('li');
+                 // Adjust according to your API response structure
+                  li.textContent = tip.title; // Example field name
+                  tipsListEl.appendChild(li);
+             });
+         } else if (tipsListEl) {
+              tipsListEl.innerHTML = '<li>No new tips.</li>';
+         }
+    }
+
+
+    // Fetch and display Attendance Summary
+     const attendancePercentEl = document.getElementById('attendancePercent');
+     const attendanceBarEl = document.getElementById('attendanceBar');
+
+    if (attendancePercentEl && attendanceBarEl) {
+         const attendanceSummary = await fetchAttendanceSummary();
+         if (attendanceSummary && attendanceSummary.attendance_percentage !== undefined) {
+             const percentage = attendanceSummary.attendance_percentage;
+              attendancePercentEl.textContent = percentage + '%';
+              attendanceBarEl.style.width = percentage + '%';
+              attendanceBarEl.setAttribute('aria-valuenow', percentage);
+         } else {
+              attendancePercentEl.textContent = 'N/A';
+               attendanceBarEl.style.width = '0%';
+               attendanceBarEl.setAttribute('aria-valuenow', 0);
+         }
+    }
+
+
+    // Fetch and display Today's Schedule (assuming endpoint and view are created)
+    const scheduleTextEl = document.getElementById('scheduleText'); // Assuming this element exists
+    if (scheduleTextEl) {
+         const todaySchedule = await fetchTodaySchedule(); // Call the placeholder function
+         if (todaySchedule && todaySchedule.length > 0) {
+             // Assuming todaySchedule is an array of schedule items
+             scheduleTextEl.innerHTML = ''; // Clear loading text
+             todaySchedule.forEach(scheduleItem => {
+                 // Adjust according to your API response structure
+                 const p = document.createElement('p');
+                 p.textContent = `${scheduleItem.course_name} at ${scheduleItem.time} in ${scheduleItem.location}`; // Example fields
+                 scheduleTextEl.appendChild(p);
+             });
+         } else if (scheduleTextEl) {
+             scheduleTextEl.textContent = 'No classes scheduled for today.';
+         }
+    }
+
+
+    // ... (rest of your existing DOMContentLoaded code like search and help form)
+
+     // Check authentication status after loading data (optional, but good practice)
+     // checkAuthAndRedirect(); // Assuming this function is in auth.js
+});
+
 </script>
 {% endblock %}

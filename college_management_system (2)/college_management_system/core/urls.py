@@ -11,6 +11,9 @@ html_patterns = [
 
 urlpatterns = [
     # Auth
+      path('api/student/today-schedule/', views.StudentTodayScheduleView.as_view(), name='student-today-schedule'),
+      path('api/student/attendance-summary/', views.StudentAttendanceSummaryView.as_view(), name='student-attendance-summary'),
+    # ... other urls
     path('api/auth/signup/', views.SignUpView.as_view(), name='signup'),
     path('api/auth/login/', views.LoginView.as_view(), name='login'),
     path('api/auth/logout/', views.LogoutView.as_view(), name='logout'),
@@ -40,6 +43,9 @@ urlpatterns = [
     # If using bulk attendance:
     #ath('api/mark-bulk-attendance/', views.MarkBulkAttendanceView.as_view(), name='mark-bulk-attendance'),
 
+path('api/student/attendance-summary/', views.StudentAttendanceSummaryView.as_view(), name='student-attendance-summary'),
+path('api/student/today-schedule/', views.StudentTodayScheduleView.as_view(), name='student-today-schedule'),
+path('api/dashboard/', views.DashboardDataView.as_view(), name='dashboard-data'),
 
     # Add other API endpoints here...
 ] + html_patterns # Add HTML serving patterns AFTER API patterns

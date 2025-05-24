@@ -1,0 +1,14 @@
+{% load static %}
+<div class="profile-section">
+    <img src="{% static 'teacher.png' %}" alt="Profile" class="profile-img" style="border: 3px solid #4e73df;">
+    <h5 style="color: #4e73df;">User Name</h5> {# To be updated by auth.js #}
+</div>
+<nav class="nav flex-column">
+    <a class="nav-link" href="{% url 'serve-html' page_name='dash.html' %}" style="color: #36b9cc;"><i class="fas fa-home"></i> Dashboard</a>
+    <a class="nav-link" href="{% url 'serve-html' page_name='scedule.html' %}" style="color: #1cc88a;"><i class="fas fa-calendar"></i> Schedule</a>
+    <a class="nav-link" href="{% url 'serve-html' page_name='faculty.html' %}" style="color: #f6c23e;"><i class="fas fa-users"></i> Faculty</a>
+    <a class="nav-link" href="{% url 'serve-html' page_name='sports.html' %}" style="color: #e74a3b;"><i class="fas fa-running"></i> Sports</a>
+    <!-- ... other links, using {% url %} tag if served by Django's serve_html view ... -->
+    <a class="nav-link" href="{% url 'serve-html' page_name='index.html' %}" style="color: #36b9cc;"><i class="fas fa-tachometer-alt"></i> Overview (Index)</a>
+    <a class="nav-link" href="{% url 'serve-html' page_name='logout.html' %}" id="sidebarLogoutLink" style="color: #858796;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</nav>

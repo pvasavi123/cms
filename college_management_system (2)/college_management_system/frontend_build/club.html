@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Clubs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .club-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .club-card:hover {
+            transform: translateY(-5px);
+        }
+        .club-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            color: white;
+        }
+        .sports { background-color: #28a745; }
+        .arts { background-color: #dc3545; }
+        .technical { background-color: #007bff; }
+        .community { background-color: #6610f2; }
+        .professional { background-color: #fd7e14; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <h2 class="mb-4 text-center text-primary animate__animated animate__fadeIn">
+            <i class="fas fa-users me-2"></i>College Clubs & Activities
+        </h2>
+        
+        <!-- Search and Filter Section -->
+        <div class="row mb-4 justify-content-center animate__animated animate__fadeInUp">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text bg-primary text-white"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control border-primary" id="clubSearch" placeholder="Search clubs...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select border-primary" id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="sports">🏃 Sports Clubs</option>
+                    <option value="arts">🎨 Arts & Culture</option>
+                    <option value="technical">💻 Technical Clubs</option>
+                    <option value="community">🤝 Community Service</option>
+                    <option value="professional">👔 Professional Societies</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Clubs List -->
+        <div class="row" id="clubsList">
+            <!-- Clubs will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        // Enhanced club data with dynamic colors
+        const clubs = [
+            {
+                name: 'Sports Club',
+                icon: 'fas fa-running',
+                category: 'sports', 
+                description: '🏆 Join various sports teams and participate in tournaments',
+                activities: ['⚽ Cricket Team', '🏀 Basketball Team', '🎽 Athletics'],
+                buttonColor: '#28a745',
+                gradient: 'linear-gradient(135deg, #43A047, #2E7D32)'
+            },
+            {
+                name: 'Fine Arts Club',
+                icon: 'fas fa-palette',
+                category: 'arts',
+                description: '🎨 Express yourself through various art forms',
+                activities: ['🖌️ Painting', '🎵 Music', '💃 Dance'],
+                buttonColor: '#dc3545',
+                gradient: 'linear-gradient(135deg, #E53935, #C62828)'
+            },
+            {
+                name: 'Tech Club',
+                icon: 'fas fa-laptop-code',
+                category: 'technical',
+                description: '💻 Explore and learn new technologies',
+                activities: ['👨‍💻 Coding Competitions', '🔧 Hackathons', '📱 Tech Workshops'],
+                buttonColor: '#0d6efd',
+                gradient: 'linear-gradient(135deg, #1976D2, #1565C0)'
+            },
+            {
+                name: 'Social Service Club',
+                icon: 'fas fa-hands-helping',
+                category: 'community',
+                description: '🌟 Make a difference in the community',
+                activities: ['❤️ Blood Donation Camps', '🌱 Environmental Drives', '📚 Education Outreach'],
+                buttonColor: '#6610f2',
+                gradient: 'linear-gradient(135deg, #7B1FA2, #6A1B9A)'
+            },
+            {
+                name: 'IEEE Student Chapter',
+                icon: 'fas fa-briefcase',
+                category: 'professional',
+                description: '🌐 Connect with industry professionals',
+                activities: ['📝 Technical Paper Presentations', '🏢 Industry Visits', '📈 Professional Development'],
+                buttonColor: '#fd7e14',
+                gradient: 'linear-gradient(135deg, #FB8C00, #EF6C00)'
+            }
+        ];
+
+        // Enhanced club card creation with animations
+        function createClubCard(club) {
+            return `
+                <div class="col-md-6 mb-4 animate__animated animate__fadeIn" data-category="${club.category}">
+                    <div class="club-card h-100" 
+                         style="background: ${club.gradient}; color: #fff; transition: all 0.3s ease;">
+                        <h4 class="d-flex align-items-center mb-3">
+                            <i class="${club.icon} fa-lg me-2"></i>
+                            ${club.name}
+                        </h4>
+                        <span class="club-badge ${club.category} mb-3 d-inline-block" 
+                              style="background: rgba(255,255,255,0.2);">
+                            ${club.category.charAt(0).toUpperCase() + club.category.slice(1)}
+                        </span>
+                        <p class="lead">${club.description}</p>
+                        <ul class="list-unstyled">
+                            ${club.activities.map(activity => `
+                                <li class="mb-2 animate__animated animate__fadeInLeft">
+                                    <i class="fas fa-check-circle me-2"></i>${activity}
+                                </li>`).join('')}
+                        </ul>
+                        <button class="btn btn-light btn-lg w-100 mt-3" 
+                                onclick="joinClub('${club.name}')"
+                                style="transition: all 0.3s ease;">
+                            <i class="fas fa-plus-circle me-2"></i>Join Club
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to render clubs with staggered animation
+        function renderClubs() {
+            const clubsList = document.getElementById('clubsList');
+            clubsList.innerHTML = '';
+            clubs.forEach((club, index) => {
+                setTimeout(() => {
+                    const clubElement = document.createElement('div');
+                    clubElement.innerHTML = createClubCard(club);
+                    clubsList.appendChild(clubElement.firstElementChild);
+                }, index * 200);
+            });
+        }
+
+        // Initial render
+        renderClubs();
+
+        // Enhanced search functionality with smooth transitions
+        document.getElementById('clubSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const clubCards = document.querySelectorAll('[data-category]');
+            
+            clubCards.forEach(card => {
+                const clubText = card.textContent.toLowerCase();
+                card.style.transition = 'all 0.5s ease';
+                
+                if (clubText.includes(searchTerm)) {
+                    card.classList.remove('animate__fadeOut');
+                    card.classList.add('animate__fadeIn');
+                    card.style.display = '';
+                } else {
+                    card.classList.remove('animate__fadeIn');
+                    card.classList.add('animate__fadeOut');
+                    setTimeout(() => card.style.display = 'none', 500);
+                }
+            });
+        });
+
+        // Enhanced category filter with dynamic transitions
+        document.getElementById('categoryFilter').addEventListener('change', function(e) {
+            const category = e.target.value.toLowerCase();
+            const clubCards = document.querySelectorAll('[data-category]');
+            
+            clubCards.forEach(card => {
+                card.style.transition = 'all 0.5s ease';
+                
+                if (!category || card.dataset.category === category) {
+                    card.classList.remove('animate__fadeOut');
+                    card.classList.add('animate__fadeIn');
+                    card.style.display = '';
+                } else {
+                    card.classList.remove('animate__fadeIn');
+                    card.classList.add('animate__fadeOut');
+                    setTimeout(() => card.style.display = 'none', 500);
+                }
+            });
+        });
+
+        // Enhanced join club functionality
+        function joinClub(clubName) {
+            // Show confirmation dialog
+            const confirmJoin = confirm(`Would you like to join ${clubName}?`);
+            
+            if (confirmJoin) {
+                // Store joined club in localStorage
+                let joinedClubs = JSON.parse(localStorage.getItem('joinedClubs') || '[]');
+                
+                if (!joinedClubs.includes(clubName)) {
+                    joinedClubs.push(clubName);
+                    localStorage.setItem('joinedClubs', JSON.stringify(joinedClubs));
+                    
+                    // Show success message
+                    alert(`Successfully joined ${clubName}! Welcome aboard! 🎉`);
+                    
+                    // Update UI to show joined status
+                    const clubButtons = document.querySelectorAll('button');
+                    clubButtons.forEach(button => {
+                        if (button.textContent.includes(clubName)) {
+                            button.innerHTML = '<i class="fas fa-check me-2"></i>Joined';
+                            button.classList.add('btn-success');
+                            button.disabled = true;
+                        }
+                    });
+                } else {
+                    alert(`You are already a member of ${clubName}`);
+                }
+            }
+        }
+
+        // Check and update joined status on page load
+        window.addEventListener('load', () => {
+            const joinedClubs = JSON.parse(localStorage.getItem('joinedClubs') || '[]');
+            const clubButtons = document.querySelectorAll('button');
+            
+            clubButtons.forEach(button => {
+                const clubName = button.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+                if (clubName && joinedClubs.includes(clubName)) {
+                    button.innerHTML = '<i class="fas fa-check me-2"></i>Joined';
+                    button.classList.add('btn-success');
+                    button.disabled = true;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

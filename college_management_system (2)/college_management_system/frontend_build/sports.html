@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Sports Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #e74c3c;
+            --accent-color: #f1c40f;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f6f9fc, #e3edf7);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sports-header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            padding: 2rem 0;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 0 0 2rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .quote-carousel {
+            background: rgba(255,255,255,0.9);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .sport-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .sport-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .sport-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .achievement-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin: 0.25rem;
+        }
+
+        .stats-counter {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .animated-text {
+            animation: colorChange 5s infinite;
+        }
+
+        @keyframes colorChange {
+            0% { color: var(--primary-color); }
+            50% { color: var(--secondary-color); }
+            100% { color: var(--primary-color); }
+        }
+    </style>
+</head>
+<body>
+    <div class="sports-header">
+        <h1 class="display-4 fw-bold"><i class="fas fa-trophy"></i> College Sports Hub</h1>
+        <p class="lead animated-text">"Champions aren't made in the gyms. Champions are made from something they have deep inside them – a desire, a dream, a vision."</p>
+    </div>
+
+    <div class="container">
+        <!-- Motivational Quote Carousel -->
+        <div class="quote-carousel text-center mb-5">
+            <div id="quoteCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <p class="h4">"The more difficult the victory, the greater the happiness in winning."</p>
+                        <small>- Pelé</small>
+                    </div>
+                    <div class="carousel-item">
+                        <p class="h4">"You miss 100% of the shots you don't take."</p>
+                        <small>- Wayne Gretzky</small>
+                    </div>
+                    <div class="carousel-item">
+                        <p class="h4">"It's not whether you get knocked down; it's whether you get up."</p>
+                        <small>- Vince Lombardi</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sports Categories -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="sport-card text-center">
+                    <i class="fas fa-futbol sport-icon"></i>
+                    <h3>Team Sports</h3>
+                    <p>Cricket, Football, Basketball, Volleyball</p>
+                    <button class="btn btn-success" onclick="joinTeam('Team Sports')">Join Team</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sport-card text-center">
+                    <i class="fas fa-running sport-icon"></i>
+                    <h3>Athletics</h3>
+                    <p>Track & Field, Cross Country, Marathon</p>
+                    <button class="btn btn-danger" onclick="registerNow('Athletics')">Register Now</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sport-card text-center">
+                    <i class="fas fa-table-tennis sport-icon"></i>
+                    <h3>Indoor Sports</h3>
+                    <p>Table Tennis, Chess, Carrom, Badminton</p>
+                    <button class="btn btn-warning" onclick="learnMore('Indoor Sports')">Learn More</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="sport-card">
+                    <h2 class="text-center mb-4">Our Achievements</h2>
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <span class="achievement-badge">🏆 State Champions 2023</span>
+                        <span class="achievement-badge">🥇 Inter-College Winners</span>
+                        <span class="achievement-badge">🏅 National Sports Meet</span>
+                        <span class="achievement-badge">🎯 Best Sports College</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="row mt-5">
+            <div class="col-md-3">
+                <div class="sport-card text-center">
+                    <div class="stats-counter">500+</div>
+                    <p>Active Players</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="sport-card text-center">
+                    <div class="stats-counter">20+</div>
+                    <p>Sports Teams</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="sport-card text-center">
+                    <div class="stats-counter">50+</div>
+                    <p>Tournaments Won</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="sport-card text-center">
+                    <div class="stats-counter">15+</div>
+                    <p>Professional Coaches</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animate statistics counters
+        document.addEventListener('DOMContentLoaded', function() {
+            const counters = document.querySelectorAll('.stats-counter');
+            counters.forEach(counter => {
+                const target = parseInt(counter.innerText);
+                let count = 0;
+                const timer = setInterval(() => {
+                    count++;
+                    counter.innerText = count + '+';
+                    if(count >= target) clearInterval(timer);
+                }, 20);
+            });
+        });
+
+        // Button click handlers
+        function joinTeam(sport) {
+            alert(`Thanks for your interest in joining ${sport}! Please fill out the registration form.`);
+            // Add form popup or redirect to registration page
+        }
+
+        function registerNow(sport) {
+            alert(`Registration for ${sport} is now open! Please complete your profile.`);
+            // Add registration logic or redirect to registration page
+        }
+
+        function learnMore(sport) {
+            alert(`Learn more about ${sport} programs and schedules.`);
+            // Add modal with detailed information or redirect to details page
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard - College Management{% endblock %}
+
+{% block extra_head %}
+<!-- Page specific CSS or meta tags -->
+<style>
+    .card { margin-bottom: 20px; }
+    /* Add other index.html specific styles here or in a separate CSS file */
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Top Navigation (if not part of base.html and specific to this page or a group of pages) -->
+<nav class="navbar navbar-expand-lg navbar-light mb-4" style="background: linear-gradient(90deg, #4e73df, #36b9cc);">
+    <div class="container-fluid">
+        <form class="d-flex" id="searchForm">
+            <input class="form-control me-2" type="search" placeholder="Search" id="searchInput">
+            <button class="btn btn-light" type="submit">Search</button>
+        </form>
+        <div class="d-flex" id="topNavAuthButtons">
+            <!-- This area will be populated by auth.js -->
+            <a href="{% url 'serve-html' page_name='login.html' %}" class="btn btn-light me-2">Login</a>
+            <a href="{% url 'serve-html' page_name='signup.html' %}" class="btn btn-warning">Sign Up</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Dashboard Cards -->
+<div class="row">
+    <!-- ... your card HTML ... -->
+     <div class="col-md-4">
+        <div class="card" style="border-left: 4px solid #4e73df;">
+            <div class="card-body">
+                <h5 class="card-title text-primary">Today's Schedule</h5>
+                <p class="card-text" id="scheduleText">Loading schedule...</p>
+                <a href="#" class="btn btn-primary" id="viewScheduleBtn">View Schedule</a>
+            </div>
+        </div>
+    </div>
+    <!-- ... more cards ... -->
+</div>
+
+<!-- Additional Sections -->
+<div class="row mt-4">
+    <!-- ... your "Student Tips" and "Need Help?" sections ... -->
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Page specific JS -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize attendance
+    const updateAttendance = (percent) => {
+        const attendancePercentEl = document.getElementById('attendancePercent');
+        const attendanceBarEl = document.getElementById('attendanceBar');
+        if (attendancePercentEl) attendancePercentEl.textContent = percent;
+        if (attendanceBarEl) attendanceBarEl.style.width = percent + '%';
+    };
+    // Check if elements exist before updating
+    if (document.getElementById('attendancePercent') && document.getElementById('attendanceBar')) {
+         updateAttendance(85); // Example
+    }
+
+
+    // Populate upcoming events
+    const events = [
+        { date: 'March 15', event: 'Sports Day' },
+        { date: 'March 20', event: 'Science Fair' },
+        { date: 'March 25', event: 'Parent Meeting' }
+    ];
+    const eventsList = document.getElementById('eventsList');
+    if (eventsList) {
+        events.forEach(event => {
+            const li = document.createElement('li');
+            li.textContent = `${event.event} - ${event.date}`;
+            eventsList.appendChild(li);
+        });
+    }
+
+
+    // Student tips (example - this should likely come from an API)
+    const tips = [ /* ... */ ];
+    const tipsList = document.getElementById('tipsList');
+    if (tipsList) {
+        // Clear existing static tips if any, then populate
+        tipsList.innerHTML = ''; // If you had static ones you want to replace
+        tips.forEach(tip => { /* ... */ });
+    }
+
+    // Search functionality
+    const searchForm = document.getElementById('searchForm');
+    if (searchForm) {
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                const searchTerm = searchInput.value;
+                console.log('Searching for:', searchTerm);
+                // Implement search logic here
+            }
+        });
+    }
+
+
+    // Help form submission (using the improved version with CSRF)
+    const helpForm = document.getElementById('helpForm');
+    if (helpForm) {
+        helpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const subjectEl = document.getElementById('helpSubject');
+            const messageEl = document.getElementById('helpMessage');
+            if (!subjectEl || !messageEl) return;
+
+            const subject = subjectEl.value;
+            const message = messageEl.value;
+            const csrfToken = getCookie('csrftoken'); // Ensure getCookie is in utils.js
+
+            try {
+                const response = await fetch('/api/help-requests/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ subject, message })
+                });
+                if (response.ok) {
+                    alert('Your help request has been submitted!');
+                    e.target.reset();
+                } else {
+                    const errorData = await response.json();
+                    alert('Failed to submit help request: ' + (errorData.detail || JSON.stringify(errorData)));
+                }
+            } catch (error) {
+                console.error('Error submitting help request:', error);
+                alert('An error occurred. Please try again.');
+            }
+        });
+    }
+
+    // Note: The old loginBtn/signupBtn logic might be removed if topNavAuthButtons is handled by auth.js
+    // The old logout logic for 'logoutLink' (which was an incorrect ID) is now handled by auth.js
+    // via the 'dynamicLogoutBtn' or a similar ID on the sidebar's logout link if preferred.
+});
+// Inside index.html script or a shared JS file
+document.getElementById('helpForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const subject = document.getElementById('helpSubject').value;
+    const message = document.getElementById('helpMessage').value;
+    const csrfToken = getCookie('csrftoken'); // Make sure getCookie is defined
+
+    try {
+        const response = await fetch('/api/help-requests/', { // Assuming this is your endpoint
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ subject, message })
+        });
+        if (response.ok) {
+            alert('Your help request has been submitted!');
+            e.target.reset();
+        } else {
+            const errorData = await response.json();
+            alert('Failed to submit help request: ' + (errorData.detail || JSON.stringify(errorData)));
+        }
+    } catch (error) {
+        console.error('Error submitting help request:', error);
+        alert('An error occurred. Please try again.');
+    }
+});
+// In a script tag or auth.js, run on DOMContentLoaded for relevant pages
+function checkAuth() {
+    const token = localStorage.getItem('authToken');
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    const publicPages = ['login.html', 'signup.html'];
+    const currentPage = window.location.pathname.split('/').pop();
+
+    if (!token && !publicPages.includes(currentPage)) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    if (token && userData) {
+        // Update UI, e.g., show username, change login/signup to logout
+        const loginBtn = document.getElementById('loginBtn'); // Assuming this is your login button
+        const profileSection = document.querySelector('.profile-section h5'); // Sidebar name
+        const topNav = document.querySelector('.navbar .container-fluid .d-flex'); // Top nav buttons area
+
+        if (profileSection && userData.first_name) {
+            profileSection.textContent = userData.first_name || userData.username;
+        }
+        
+        if (topNav) {
+            // Remove login/signup, add logout or profile
+            topNav.innerHTML = `
+                <span class="navbar-text me-3">Welcome, ${userData.first_name || userData.username}!</span>
+                <a href="#" class="btn btn-outline-light" id="dynamicLogoutBtn">Logout</a>
+            `;
+            document.getElementById('dynamicLogoutBtn').addEventListener('click', handleLogoutClick); // Ensure handleLogoutClick is defined
+        }
+        
+        // Conditional rendering of sidebar items based on userData.role
+        const facultyOnlyLinks = ['faculty.html']; // Add links only for faculty
+        const adminOnlyLinks = []; // Add links only for admin
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            const href = link.getAttribute('href');
+            if (userData.role !== 'faculty' && facultyOnlyLinks.includes(href)) {
+                link.style.display = 'none';
+            }
+            if (userData.role !== 'admin' && adminOnlyLinks.includes(href)) {
+                link.style.display = 'none';
+            }
+        });
+
+    } else if (token && !userData && !publicPages.includes(currentPage)){
+        // Token exists but no user data, something is wrong, try to logout / clear
+        console.warn("Token found but no user data. Clearing token.");
+        localStorage.removeItem('authToken');
+        window.location.href = 'login.html';
+    }
+}
+document.addEventListener('DOMContentLoaded', checkAuth);
+// Ensure getCookie and handleLogoutClick are available
+// ... (getCookie and handleLogoutClick functions)
+</script>
+{% endblock %}

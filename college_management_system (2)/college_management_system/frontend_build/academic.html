@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Calendar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .calendar-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .calendar-card:hover {
+            transform: translateY(-5px);
+        }
+        .event-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            color: white;
+            margin-right: 5px;
+        }
+        .academic { background-color: #007bff; }
+        .exam { background-color: #dc3545; }
+        .holiday { background-color: #28a745; }
+        .event { background-color: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4 text-center">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Academic Calendar 2024-28
+        </h2>
+        
+        <!-- Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="eventSearch" placeholder="Search events...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" id="semesterFilter">
+                    <option value="">All Semesters</option>
+                    <option value="sem1">Semester 1</option>
+                    <option value="sem2">Semester 2</option>
+                    <option value="sem3">Semester 3</option>
+                    <option value="sem4">Semester 4</option>
+                    <option value="sem5">Semester 5</option>
+                    <option value="sem6">Semester 6</option>
+                    <option value="sem7">Semester 7</option>
+                    <option value="sem8">Semester 8</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-control" id="eventTypeFilter">
+                    <option value="">All Event Types</option>
+                    <option value="academic">Academic</option>
+                    <option value="exam">Exam</option>
+                    <option value="holiday">Holiday</option>
+                    <option value="event">Event</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Calendar Events -->
+        <div class="row" id="calendarEvents">
+            <!-- Semester 1 -->
+            <div class="col-12 mb-4" data-semester="sem1">
+                <div class="calendar-card">
+                    <h4 class="d-flex align-items-center">
+                        <i class="fas fa-book-reader me-2"></i>
+                        Semester 1 (August - December 2024)
+                        <span class="ms-auto badge bg-primary" id="sem1EventCount"></span>
+                    </h4>
+                    <div class="events-list">
+                        <div class="event-item mb-3" data-event-type="academic">
+                            <span class="event-badge academic">Academic</span>
+                            <strong>Aug 1, 2024:</strong> Classes Begin
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="holiday">
+                            <span class="event-badge holiday">Holiday</span>
+                            <strong>Aug 15, 2024:</strong> Independence Day
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="event">
+                            <span class="event-badge event">Event</span>
+                            <strong>Sep 5, 2024:</strong> Freshers Welcome
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="holiday">
+                            <span class="event-badge holiday">Holiday</span>
+                            <strong>Oct 2, 2024:</strong> Gandhi Jayanti
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Oct 15-20, 2024:</strong> Mid-term Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="holiday">
+                            <span class="event-badge holiday">Holiday</span>
+                            <strong>Nov 12-16, 2024:</strong> Diwali Break
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Dec 10-20, 2024:</strong> End Semester Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semester 2 -->
+            <div class="col-12 mb-4" data-semester="sem2">
+                <div class="calendar-card">
+                    <h4 class="d-flex align-items-center">
+                        <i class="fas fa-book-reader me-2"></i>
+                        Semester 2 (January - May 2025)
+                        <span class="ms-auto badge bg-primary" id="sem2EventCount"></span>
+                    </h4>
+                    <div class="events-list">
+                        <div class="event-item mb-3" data-event-type="academic">
+                            <span class="event-badge academic">Academic</span>
+                            <strong>Jan 2, 2025:</strong> Classes Begin
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Mar 15-20, 2025:</strong> Mid-term Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>May 10-20, 2025:</strong> End Semester Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semester 3 -->
+            <div class="col-12 mb-4" data-semester="sem3">
+                <div class="calendar-card">
+                    <h4 class="d-flex align-items-center">
+                        <i class="fas fa-book-reader me-2"></i>
+                        Semester 3 (August - December 2025)
+                        <span class="ms-auto badge bg-primary" id="sem3EventCount"></span>
+                    </h4>
+                    <div class="events-list">
+                        <div class="event-item mb-3" data-event-type="academic">
+                            <span class="event-badge academic">Academic</span>
+                            <strong>Aug 1, 2025:</strong> Classes Begin
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Oct 15-20, 2025:</strong> Mid-term Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Dec 10-20, 2025:</strong> End Semester Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semester 4 -->
+            <div class="col-12 mb-4" data-semester="sem4">
+                <div class="calendar-card">
+                    <h4 class="d-flex align-items-center">
+                        <i class="fas fa-book-reader me-2"></i>
+                        Semester 4 (January - May 2026)
+                        <span class="ms-auto badge bg-primary" id="sem4EventCount"></span>
+                    </h4>
+                    <div class="events-list">
+                        <div class="event-item mb-3" data-event-type="academic">
+                            <span class="event-badge academic">Academic</span>
+                            <strong>Jan 2, 2026:</strong> Classes Begin
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="holiday">
+                            <span class="event-badge holiday">Holiday</span>
+                            <strong>Jan 26, 2026:</strong> Republic Day
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="event">
+                            <span class="event-badge event">Event</span>
+                            <strong>Feb 15, 2026:</strong> Technical Symposium
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Mar 15-20, 2026:</strong> Mid-term Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="holiday">
+                            <span class="event-badge holiday">Holiday</span>
+                            <strong>Apr 14, 2026:</strong> Ambedkar Jayanti
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>May 10-20, 2026:</strong> End Semester Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semester 5 -->
+            <div class="col-12 mb-4" data-semester="sem5">
+                <div class="calendar-card">
+                    <h4 class="d-flex align-items-center">
+                        <i class="fas fa-book-reader me-2"></i>
+                        Semester 5 (August - December 2026)
+                        <span class="ms-auto badge bg-primary" id="sem5EventCount"></span>
+                    </h4>
+                    <div class="events-list">
+                        <div class="event-item mb-3" data-event-type="academic">
+                            <span class="event-badge academic">Academic</span>
+                            <strong>Aug 1, 2026:</strong> Classes Begin
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Oct 15-20, 2026:</strong> Mid-term Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Dec 10-20, 2026:</strong> End Semester Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semester 6 -->
+            <div class="col-12 mb-4" data-semester="sem6">
+                <div class="calendar-card">
+                    <h4 class="d-flex align-items-center">
+                        <i class="fas fa-book-reader me-2"></i>
+                        Semester 6 (January - May 2027)
+                        <span class="ms-auto badge bg-primary" id="sem6EventCount"></span>
+                    </h4>
+                    <div class="events-list">
+                        <div class="event-item mb-3" data-event-type="academic">
+                            <span class="event-badge academic">Academic</span>
+                            <strong>Jan 2, 2027:</strong> Classes Begin
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="holiday">
+                            <span class="event-badge holiday">Holiday</span>
+                            <strong>Jan 26, 2027:</strong> Republic Day
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="event">
+                            <span class="event-badge event">Event</span>
+                            <strong>Feb 20, 2027:</strong> Annual Cultural Fest
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Mar 15-20, 2027:</strong> Mid-term Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="holiday">
+                            <span class="event-badge holiday">Holiday</span>
+                            <strong>Apr 14, 2027:</strong> Ambedkar Jayanti
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>May 10-20, 2027:</strong> End Semester Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semester 7 -->
+            <div class="col-12 mb-4" data-semester="sem7">
+                <div class="calendar-card">
+                    <h4 class="d-flex align-items-center">
+                        <i class="fas fa-book-reader me-2"></i>
+                        Semester 7 (August - December 2027)
+                        <span class="ms-auto badge bg-primary" id="sem7EventCount"></span>
+                    </h4>
+                    <div class="events-list">
+                        <div class="event-item mb-3" data-event-type="academic">
+                            <span class="event-badge academic">Academic</span>
+                            <strong>Aug 1, 2027:</strong> Classes Begin
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Oct 15-20, 2027:</strong> Mid-term Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Dec 10-20, 2027:</strong> End Semester Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semester 8 -->
+            <div class="col-12 mb-4" data-semester="sem8">
+                <div class="calendar-card">
+                    <h4 class="d-flex align-items-center">
+                        <i class="fas fa-book-reader me-2"></i>
+                        Semester 8 (January - May 2028)
+                        <span class="ms-auto badge bg-primary" id="sem8EventCount"></span>
+                    </h4>
+                    <div class="events-list">
+                        <div class="event-item mb-3" data-event-type="academic">
+                            <span class="event-badge academic">Academic</span>
+                            <strong>Jan 2, 2028:</strong> Classes Begin
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="holiday">
+                            <span class="event-badge holiday">Holiday</span>
+                            <strong>Jan 26, 2028:</strong> Republic Day
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="event">
+                            <span class="event-badge event">Event</span>
+                            <strong>Feb 25, 2028:</strong> Farewell Ceremony
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>Mar 15-20, 2028:</strong> Mid-term Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="holiday">
+                            <span class="event-badge holiday">Holiday</span>
+                            <strong>Apr 14, 2028:</strong> Ambedkar Jayanti
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="exam">
+                            <span class="event-badge exam">Exam</span>
+                            <strong>May 10-20, 2028:</strong> End Semester Examinations
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                        <div class="event-item mb-3" data-event-type="event">
+                            <span class="event-badge event">Event</span>
+                            <strong>May 25, 2028:</strong> Graduation Ceremony
+                            <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                                <i class="fas fa-plus"></i> Add to Calendar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // In academic.html <script> tag
+async function fetchAcademicEvents() {
+    try {
+        const response = await fetch('/api/academic-events/'); // Your Django API endpoint
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        // Now use 'data' to populate your calendar events dynamically
+        // This will replace the hardcoded event items.
+        // For example, you'd clear the existing #calendarEvents div
+        // and loop through 'data' to create new event items.
+        console.log(data);
+        populateCalendar(data); // You'll need to write this function
+    } catch (error) {
+        console.error("Could not fetch academic events:", error);
+    }
+}
+
+function populateCalendar(eventsData) {
+    const calendarEventsDiv = document.getElementById('calendarEvents');
+    calendarEventsDiv.innerHTML = ''; // Clear existing static content
+
+    // Group events by semester for rendering (if API doesn't do it)
+    const eventsBySemester = {};
+    eventsData.forEach(event => {
+        const semName = event.semester; // Assuming semester is a string name
+        if (!eventsBySemester[semName]) {
+            eventsBySemester[semName] = { name: semName, events: [], data_semester_attr: `sem${semName.match(/\d+/)[0]}` }; // simple semX id
+        }
+        eventsBySemester[semName].events.push(event);
+    });
+
+
+    Object.values(eventsBySemester).forEach(semesterGroup => {
+        const semesterDiv = document.createElement('div');
+        semesterDiv.className = 'col-12 mb-4';
+        semesterDiv.setAttribute('data-semester', semesterGroup.data_semester_attr); // e.g., sem1
+
+        let eventsHtml = '';
+        semesterGroup.events.forEach(event => {
+            eventsHtml += `
+                <div class="event-item mb-3" data-event-type="${event.event_type.name.toLowerCase()}">
+                    <span class="event-badge ${event.event_type.color_class}">${event.event_type.name}</span>
+                    <strong>${new Date(event.date_from).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}:</strong> ${event.title}
+                    ${event.description ? `<p class="text-muted small">${event.description}</p>` : ''}
+                    <button class="btn btn-sm btn-outline-primary float-end" onclick="addToCalendar(this)">
+                        <i class="fas fa-plus"></i> Add to Calendar
+                    </button>
+                </div>
+            `;
+        });
+
+        semesterDiv.innerHTML = `
+            <div class="calendar-card">
+                <h4 class="d-flex align-items-center">
+                    <i class="fas fa-book-reader me-2"></i>
+                    ${semesterGroup.name}
+                    <span class="ms-auto badge bg-primary" id="${semesterGroup.data_semester_attr}EventCount"></span>
+                </h4>
+                <div class="events-list">
+                    ${eventsHtml}
+                </div>
+            </div>
+        `;
+        calendarEventsDiv.appendChild(semesterDiv);
+    });
+    updateEventCounts(); // Your existing function
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchAcademicEvents();
+    // ... your other existing JS initializations
+});
+        // Update event counts
+        function updateEventCounts() {
+            ['sem1', 'sem2', 'sem3', 'sem4', 'sem5', 'sem6', 'sem7', 'sem8'].forEach(sem => {
+                const visibleEvents = document.querySelector(`[data-semester="${sem}"]`)
+                    .querySelectorAll('.event-item:not([style*="display: none"])').length;
+                document.getElementById(`${sem}EventCount`).textContent = `${visibleEvents} Events`;
+            });
+        }
+
+        // Search functionality with animation
+        document.getElementById('eventSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const eventItems = document.querySelectorAll('.event-item');
+            
+            eventItems.forEach(item => {
+                const eventText = item.textContent.toLowerCase();
+                if (eventText.includes(searchTerm)) {
+                    item.style.display = '';
+                    item.style.opacity = '0';
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.transition = 'opacity 0.3s ease-in';
+                    }, 50);
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            updateEventCounts();
+        });
+
+        // Semester filter functionality
+        document.getElementById('semesterFilter').addEventListener('change', function(e) {
+            filterEvents();
+        });
+
+        // Event type filter functionality
+        document.getElementById('eventTypeFilter').addEventListener('change', function(e) {
+            filterEvents();
+        });
+
+        function filterEvents() {
+            const semester = document.getElementById('semesterFilter').value;
+            const eventType = document.getElementById('eventTypeFilter').value;
+            
+            const semesterDivs = document.querySelectorAll('[data-semester]');
+            const eventItems = document.querySelectorAll('.event-item');
+            
+            semesterDivs.forEach(div => {
+                const shouldShowSemester = !semester || div.dataset.semester === semester;
+                div.style.display = shouldShowSemester ? '' : 'none';
+            });
+
+            eventItems.forEach(item => {
+                const shouldShowType = !eventType || item.dataset.eventType === eventType;
+                if (shouldShowType) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            updateEventCounts();
+        }
+
+        // Add to calendar functionality
+        function addToCalendar(button) {
+            const eventText = button.parentElement.textContent.trim();
+            button.innerHTML = '<i class="fas fa-check"></i> Added';
+            button.classList.remove('btn-outline-primary');
+            button.classList.add('btn-success');
+            button.disabled = true;
+            
+            // Show toast notification
+            const toast = document.createElement('div');
+            toast.className = 'toast position-fixed bottom-0 end-0 m-3';
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="toast-header">
+                    <i class="fas fa-calendar-check me-2"></i>
+                    <strong class="me-auto">Event Added</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    Event has been added to your calendar
+                </div>
+            `;
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+
+        // Initialize event counts
+        updateEventCounts();
+    </script>
+</body>
+</html>

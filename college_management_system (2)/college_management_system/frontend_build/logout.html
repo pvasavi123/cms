@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Management System - Logout</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logout-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .logout-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .btn-login { /* Changed from btn-signin */
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .btn-login:hover { /* Changed from btn-signin */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78,115,223,0.3);
+            color: white;
+        }
+
+        .countdown {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin: 1rem 0;
+        }
+        #statusMessage {
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-card">
+        <i class="fas fa-sign-out-alt logout-icon"></i>
+        <h2 class="mb-3">Logging Out...</h2>
+        <p id="statusMessage" class="text-muted">Processing your logout request.</p>
+        <div class="countdown">
+            You will be redirected to the login page in <span id="timer">5</span> seconds...
+        </div>
+        <a href="login.html" class="btn-login">Login Again</a>
+    </div>
+
+    <script>
+        let timeLeft = 5;
+        const timerElement = document.getElementById('timer');
+        const statusMessageElement = document.getElementById('statusMessage');
+        let countdownInterval;
+
+        // Function to get CSRF token (Django specific)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function startRedirectTimer() {
+            timerElement.textContent = timeLeft; // Initialize timer display
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = 'login.html'; // Redirect to login.html
+                }
+            }, 1000);
+        }
+
+        async function performLogout() {
+            const token = localStorage.getItem('authToken');
+            
+            // Clear client-side storage immediately regardless of API call success for security.
+            // The API call is to invalidate the token on the server.
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            // sessionStorage.clear(); // If you use sessionStorage
+
+            if (token) {
+                try {
+                    const response = await fetch('/api/auth/logout/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Token ${token}`,
+                            'X-CSRFToken': getCookie('csrftoken') // CSRF needed for session logout if active
+                        },
+                        // No body is needed for this specific logout endpoint
+                    });
+
+                    if (response.ok) {
+                        console.log('Successfully logged out from backend.');
+                        statusMessageElement.textContent = 'Logged out successfully!';
+                        statusMessageElement.classList.remove('text-muted');
+                        statusMessageElement.classList.add('text-success');
+                    } else {
+                        // Even if backend logout fails (e.g., token already invalid), proceed with client-side logout
+                        console.warn('Backend logout call failed or user was not authenticated. Status:', response.status);
+                        statusMessageElement.textContent = 'Logout processed. Session might have already expired.';
+                        statusMessageElement.classList.remove('text-muted');
+                        statusMessageElement.classList.add('text-warning');
+                    }
+                } catch (error) {
+                    console.error('Error during logout API call:', error);
+                    statusMessageElement.textContent = 'Error connecting to logout service. Cleared local session.';
+                    statusMessageElement.classList.remove('text-muted');
+                    statusMessageElement.classList.add('text-danger');
+                }
+            } else {
+                console.log('No auth token found in localStorage. Proceeding with client-side cleanup.');
+                statusMessageElement.textContent = 'No active session found. Redirecting...';
+            }
+            
+            startRedirectTimer(); // Start timer after API call attempt
+        }
+
+        window.onload = function() {
+            performLogout();
+        };
+    </script>
+</body>
+</html>
